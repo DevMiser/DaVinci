@@ -1,3 +1,4 @@
+#This code was prepared by DevMiser:
 import boto3
 import openai
 import os
