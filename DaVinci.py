@@ -1,4 +1,4 @@
-# the following program provided by Devmiser - https://github.com/Devmiser
+# the following program provided by DevMiser - https://github.com/DevMiser
 
 import boto3
 import openai
