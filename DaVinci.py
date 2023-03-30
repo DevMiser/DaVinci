@@ -1,4 +1,4 @@
-# the following program provided by DevMiser - https://github.com/DevMiser
+# the following program is provided by DevMiser - https://github.com/DevMiser
 
 import boto3
 import openai
@@ -79,6 +79,19 @@ def responseprinter(chat):
        time.sleep(0.055)
        print(word, end="", flush=True)
     print()
+
+#DaVinci will 'remember' earlier queries so that it has greater continuity in its response
+#the following will delete that 'memory' five minutes after the start of the conversation
+def append_clear_countdown():
+    sleep(300)
+    global messages
+    messages.clear()
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        ]    
+    global count
+    count = 0
+    t_count.join
 
 def voice(chat):
    
@@ -262,8 +275,16 @@ try:
     
     event = threading.Event()
 
+    count = 0
+
     while True:
         
+        if count == 0:
+            t_count = threading.Thread(target=append_clear_countdown)
+            t_count.start()
+        else:
+            pass   
+        count += 1
         wake_word()
         voice(random.choice(prompt))
         recorder = Recorder()
