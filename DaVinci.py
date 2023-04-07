@@ -48,7 +48,7 @@ wav_file = None
 
 GPT_model = "gpt-3.5-turbo-0301" # most capable GPT-3.5 model and optimized for chat
 # this will be supported until at least June 1
-# OpenAI willupdate gpt-3.5-turbo to a new stable release in April
+# OpenAI will update gpt-3.5-turbo to a new stable release in April
 openai.api_key = "put your secret API key between these quotation marks"
 pv_access_key= "put your secret access key between these quotation marks"
 
@@ -61,18 +61,18 @@ prompt = ["How may I assist you?",
     "I'm listening.",
     "What would you like me to do?"]
 
-messages=[
+chat_log=[
     {"role": "system", "content": "You are a helpful assistant."},
     ]
 
 def ChatGPT(query):
-    messages.append ({"role": "user", "content": query})
+    chat_log.append ({"role": "user", "content": query})
     response = openai.ChatCompletion.create(
     model=GPT_model,
-    messages=messages
+    messages=chat_log
     )
     return str.strip(response['choices'][0]['message']['content'])
-    messages.append({"role": "system", "content": response})
+    chat_log.append({"role": "system", "content": response})
 
 def responseprinter(chat):
     for word in chat:
@@ -84,9 +84,9 @@ def responseprinter(chat):
 #the following will delete that 'memory' five minutes after the start of the conversation
 def append_clear_countdown():
     sleep(300)
-    global messages
-    messages.clear()
-    messages=[
+    global chat_log
+    chat_log.clear()
+    chat_log=[
         {"role": "system", "content": "You are a helpful assistant."},
         ]    
     global count
@@ -286,6 +286,7 @@ try:
             pass   
         count += 1
         wake_word()
+# comment out the next line if you do not want DaVinci to respond to his name        
         voice(random.choice(prompt))
         recorder = Recorder()
         recorder.start()
