@@ -46,9 +46,7 @@ porcupine = None
 recorder = None
 wav_file = None
 
-GPT_model = "gpt-3.5-turbo-0301" # most capable GPT-3.5 model and optimized for chat
-# this will be supported until at least June 1
-# OpenAI will update gpt-3.5-turbo to a new stable release in April
+GPT_model = "gpt-3.5-turbo" # most capable GPT-3.5 model and optimized for chat
 openai.api_key = "put your secret API key between these quotation marks"
 pv_access_key= "put your secret access key between these quotation marks"
 
