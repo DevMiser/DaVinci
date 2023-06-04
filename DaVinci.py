@@ -138,7 +138,8 @@ def fade_leds(event):
 def wake_word():
 
     porcupine = pvporcupine.create(keywords=["computer", "jarvis", "DaVinci",],
-                            access_key=pv_access_key,                                   
+                            access_key=pv_access_key,
+                            sensitivities=[0.1, 0.1, 0.1], #from 0 to 1.0 - a higher number reduces the miss rate at the cost of increased false alarms
                                    )
     devnull = os.open(os.devnull, os.O_WRONLY)
     old_stderr = os.dup(2)
