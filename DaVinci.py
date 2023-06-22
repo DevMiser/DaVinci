@@ -336,9 +336,9 @@ try:
             recorder = None
             sleep(1)
 
-        except openai.error.Timeout as e:
-            print("\nYour request timed out.  Please try again in a few minutes.")
-            voice("\nYour request timed out.  Please try again in a few minutes.")
+        except openai.error.RateLimitError as e:
+            print("\nYou have hit your assigned rate limit.")
+            voice("\nYou have hit your assigned rate limit.")
             event.set()
             GPIO.output(led1_pin, GPIO.LOW)
             GPIO.output(led2_pin, GPIO.LOW)        
