@@ -64,13 +64,17 @@ chat_log=[
     ]
 
 def ChatGPT(query):
-    chat_log.append ({"role": "user", "content": query})
+    user_query=[
+        {"role": "user", "content": query},
+        ]
+    send_query = (chat_log + user_query)
     response = openai.ChatCompletion.create(
     model=GPT_model,
-    messages=chat_log
+    messages=send_query
     )
+    answer = response.choices[0]['message']['content']
+    chat_log.append({"role": "assistant", "content": answer})
     return str.strip(response['choices'][0]['message']['content'])
-    chat_log.append({"role": "system", "content": response})
 
 def responseprinter(chat):
     for word in chat:
