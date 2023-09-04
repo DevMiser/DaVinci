@@ -77,7 +77,10 @@ def ChatGPT(query):
     return str.strip(response['choices'][0]['message']['content'])
 
 def responseprinter(chat):
-    for word in chat:
+    wrapper = textwrap.TextWrapper(width=70)  # Adjust the width to your preference
+    paragraphs = res.split('\n')
+    wrapped_chat = "\n".join([wrapper.fill(p) for p in paragraphs])
+    for word in wrapped_chat:
        time.sleep(0.055)
        print(word, end="", flush=True)
     print()
@@ -96,7 +99,6 @@ def append_clear_countdown():
     t_count.join
 
 def voice(chat):
-   
     voiceResponse = polly.synthesize_speech(Text=chat, OutputFormat="mp3",
                     VoiceId="Matthew") #other options include Amy, Joey, Nicole, Raveena and Russell
     if "AudioStream" in voiceResponse:
