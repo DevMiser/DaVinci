@@ -60,7 +60,7 @@ prompt = ["How may I assist you?",
     "What would you like me to do?"]
 
 chat_log=[
-    {"role": "system", "content": "You are a helpful assistant."},
+    {"role": "system", "content": "Your name is DaVinci. You are a helpful assistant."},
     ]
 
 def ChatGPT(query):
@@ -74,7 +74,7 @@ def ChatGPT(query):
     )
     answer = response.choices[0]['message']['content']
     chat_log.append({"role": "assistant", "content": answer})
-    return str.strip(response['choices'][0]['message']['content'])
+    return answer
 
 def responseprinter(chat):
     wrapper = textwrap.TextWrapper(width=70)  # Adjust the width to your preference
@@ -92,7 +92,7 @@ def append_clear_countdown():
     global chat_log
     chat_log.clear()
     chat_log=[
-        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "system", "content": "Your name is DaVinci. You are a helpful assistant."},
         ]    
     global count
     count = 0
