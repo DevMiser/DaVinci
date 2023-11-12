@@ -1,3 +1,8 @@
+IMPORTANT TEMPORARY CHANGE - OpenAI recently updated its API
+For now, instead of using the command "pip3 install --upgrade openai"
+in the instructions below, use the command
+pip3 install openai==0.28
+
 ![DaVinci Small](https://user-images.githubusercontent.com/22980908/233852733-088f6053-4a10-4ac4-ac80-babd44125cce.jpg)
 
 <img width="653" alt="1" src="https://user-images.githubusercontent.com/22980908/233854978-c6c8ac2e-517a-4b27-ba74-5b4a9d4827fc.png">
