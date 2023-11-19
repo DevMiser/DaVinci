@@ -1,5 +1,7 @@
 # the following program is provided by DevMiser - https://github.com/DevMiser
 
+#!/usr/bin/env python3
+
 import boto3
 import openai
 import os
@@ -21,6 +23,7 @@ environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 import pygame
 
 from colorama import Fore, Style
+from openai import OpenAI
 from pvleopard import *
 from pvrecorder import PvRecorder
 from threading import Thread, Event
@@ -30,7 +33,7 @@ GPIO.setwarnings(False)
 
 GPIO.setmode(GPIO.BCM)
 led1_pin=18
-led2_pin=23
+led2_pin=24
 
 GPIO.setup(led1_pin, GPIO.OUT)
 GPIO.output(led1_pin, GPIO.LOW)
@@ -46,9 +49,11 @@ porcupine = None
 recorder = None
 wav_file = None
 
-GPT_model = "gpt-3.5-turbo" # most capable GPT-3.5 model and optimized for chat
+GPT_model = "gpt-4" # most capable GPT model and optimized for chat.  You can substitute with gpt-3.5-turbo for lower cost and latency.
 openai.api_key = "put your secret API key between these quotation marks"
 pv_access_key= "put your secret access key between these quotation marks"
+
+client = OpenAI(api_key=openai.api_key)
 
 prompt = ["How may I assist you?",
     "How may I help?",
@@ -60,28 +65,28 @@ prompt = ["How may I assist you?",
     "What would you like me to do?"]
 
 chat_log=[
-    {"role": "system", "content": "Your name is DaVinci. You are a helpful assistant."},
+    {"role": "system", "content": "Your name is DaVinci. You are a helpful assistant. If asked about yourself, you include your name in your response."},
     ]
 
 def ChatGPT(query):
-    user_query=[
+    user_query = [
         {"role": "user", "content": query},
-        ]
+        ]         
     send_query = (chat_log + user_query)
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
     model=GPT_model,
     messages=send_query
     )
-    answer = response.choices[0]['message']['content']
+    answer = response.choices[0].message.content
     chat_log.append({"role": "assistant", "content": answer})
     return answer
-
+    
 def responseprinter(chat):
     wrapper = textwrap.TextWrapper(width=70)  # Adjust the width to your preference
     paragraphs = res.split('\n')
     wrapped_chat = "\n".join([wrapper.fill(p) for p in paragraphs])
     for word in wrapped_chat:
-       time.sleep(0.055)
+       time.sleep(0.06)
        print(word, end="", flush=True)
     print()
 
@@ -92,13 +97,14 @@ def append_clear_countdown():
     global chat_log
     chat_log.clear()
     chat_log=[
-        {"role": "system", "content": "Your name is DaVinci. You are a helpful assistant."},
+        {"role": "system", "content": "Your name is DaVinci. You are a helpful assistant. If asked about yourself, you include your name in your response."},
         ]    
     global count
     count = 0
     t_count.join
 
 def voice(chat):
+   
     voiceResponse = polly.synthesize_speech(Text=chat, OutputFormat="mp3",
                     VoiceId="Matthew") #other options include Amy, Joey, Nicole, Raveena and Russell
     if "AudioStream" in voiceResponse:
@@ -142,8 +148,9 @@ def fade_leds(event):
         time.sleep(0.75)
         
 def wake_word():
-
-    porcupine = pvporcupine.create(keywords=["computer", "jarvis", "DaVinci",],
+    
+    keywords = ["computer", "jarvis", "DaVinci"]
+    porcupine = pvporcupine.create(keywords=keywords,
                             access_key=pv_access_key,
                             sensitivities=[0.1, 0.1, 0.1], #from 0 to 1.0 - a higher number reduces the miss rate at the cost of increased false alarms
                                    )
@@ -174,8 +181,8 @@ def wake_word():
 
             GPIO.output(led1_pin, GPIO.HIGH)
             GPIO.output(led2_pin, GPIO.HIGH)
-
-            print(Fore.GREEN + "\nWake word detected\n")
+            keyword = keywords[porcupine_keyword_index]
+            print(Fore.GREEN + "\n" + keyword + " detected\n")
             porcupine_audio_stream.stop_stream
             porcupine_audio_stream.close()
             porcupine.delete()         
@@ -320,7 +327,7 @@ try:
             o.delete
             recorder = None
 
-        except openai.error.APIError as e:
+        except openai.APIError as e:
             print("\nThere was an API error.  Please try again in a few minutes.")
             voice("\nThere was an A P I error.  Please try again in a few minutes.")
             event.set()
@@ -331,18 +338,7 @@ try:
             recorder = None
             sleep(1)
 
-        except openai.error.Timeout as e:
-            print("\nYour request timed out.  Please try again in a few minutes.")
-            voice("\nYour request timed out.  Please try again in a few minutes.")
-            event.set()
-            GPIO.output(led1_pin, GPIO.LOW)
-            GPIO.output(led2_pin, GPIO.LOW)        
-            recorder.stop()
-            o.delete
-            recorder = None
-            sleep(1)
-
-        except openai.error.RateLimitError as e:
+        except openai.RateLimitError as e:
             print("\nYou have hit your assigned rate limit.")
             voice("\nYou have hit your assigned rate limit.")
             event.set()
@@ -351,9 +347,9 @@ try:
             recorder.stop()
             o.delete
             recorder = None
-            sleep(1)
+            break
 
-        except openai.error.APIConnectionError as e:
+        except openai.APIConnectionError as e:
             print("\nI am having trouble connecting to the API.  Please check your network connection and then try again.")
             voice("\nI am having trouble connecting to the A P I.  Please check your network connection and try again.")
             event.set()
@@ -364,7 +360,7 @@ try:
             recorder = None
             sleep(1)
 
-        except openai.error.AuthenticationError as e:
+        except openai.AuthenticationError as e:
             print("\nYour OpenAI API key or token is invalid, expired, or revoked.  Please fix this issue and then restart my program.")
             voice("\nYour Open A I A P I key or token is invalid, expired, or revoked.  Please fix this issue and then restart my program.")
             event.set()
@@ -374,18 +370,7 @@ try:
             o.delete
             recorder = None
             break
-
-        except openai.error.ServiceUnavailableError as e:
-            print("\nThere is an issue with OpenAI’s servers.  Please try again later.")
-            voice("\nThere is an issue with Open A I’s servers.  Please try again later.")
-            event.set()
-            GPIO.output(led1_pin, GPIO.LOW)
-            GPIO.output(led2_pin, GPIO.LOW)        
-            recorder.stop()
-            o.delete
-            recorder = None
-            sleep(1)
-        
+     
 except KeyboardInterrupt:
     print("\nExiting ChatGPT Virtual Assistant")
     o.delete
