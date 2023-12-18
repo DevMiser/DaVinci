@@ -1,3 +1,6 @@
+Raspberry Pi’s newest OS (Bookworm) released on December 5, 2023, does not work well with this installation.
+For best results, use a Raspberry Pi 4 (not a Raspberry Pi 5) and use the legacy 64-bit OS.
+Instructions are in the Important - Please Read file on this repository.
 
 ![DaVinci Small](https://user-images.githubusercontent.com/22980908/233852733-088f6053-4a10-4ac4-ac80-babd44125cce.jpg)
 
