@@ -6,7 +6,7 @@
 # on your Raspberry Pi
 # You must also download the file leopard_params_it.pv from
 # https://github.com/Picovoice/leopard/tree/master/lib/common and place it
-# in the /home/pi/.local/lib/python3.9/site-packages/pvporcupine/lib/common folder
+# in the /home/pi/.local/lib/python3.9/site-packages/pvleopard/lib/common folder
 # on your Raspberry Pi
 # You must also create a new wake word in Italian using the Picovoice console
 # (https://console.picovoice.ai/), choose Raspberry Pi as the Platform, download the file,
