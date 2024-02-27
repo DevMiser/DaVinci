@@ -5,6 +5,8 @@ Instructions are in the Important - Please Read file on this repository.
 DaVinci now uses GPT-4.
 
 Feb. 23, 2024 Update - I added an alternative voice to DaVinci that uses OpenAI’s text-to-speech model instead of Amazon Polly.  The alternative file is called DaVinciAltVoice.py.  If you decide to you use this version, you do not need to create an AWS account.  In the rest of the instructions, you can skip “pip3 install boto” and “pip3 install awscli” and all of step 3 for configuring the AWS interface.  Substitute “DaVinciAltVoice.py” for “DaVinci.py” everywhere it appears in the instructions.
+
+I also added an Italian speaking version - DaVinciItalian.py.  To use it, you must follow the instructions in the introductory comments in the program.
  
 
 ![DaVinci Small](https://user-images.githubusercontent.com/22980908/233852733-088f6053-4a10-4ac4-ac80-babd44125cce.jpg)
