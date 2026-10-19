@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DaVinci Setup</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, system-ui, sans-serif; margin: 0;
+         background: #eef1f7; color: #1c1c1e; }
+  header { background: linear-gradient(135deg, #4338ca 0%, #0a84ff 100%);
+           padding: 22px 16px; text-align: center; color: #fff;
+           box-shadow: 0 2px 8px rgba(20,40,120,.25); }
+  h1 { margin: 0; font-size: 21px; letter-spacing: .01em; }
+  #sub { color: rgba(255,255,255,.8); font-size: 14px; margin-top: 5px; }
+  main { padding: 16px; max-width: 480px; margin: 0 auto; }
+  h2 { font-size: 13px; color: #4338ca; text-transform: uppercase;
+       letter-spacing: .06em; margin: 18px 4px 8px; font-weight: 700; }
+  #nets { background: #fff; border-radius: 14px; overflow: hidden;
+          box-shadow: 0 2px 6px rgba(30,40,90,.08); }
+  .net { display: flex; align-items: center; justify-content: space-between;
+         padding: 13px 16px; border-bottom: 1px solid #f0f0f4;
+         border-left: 3px solid transparent; cursor: pointer;
+         transition: background .15s; }
+  .net:last-child { border-bottom: none; }
+  .net:active { background: #f2f6ff; }
+  .net.sel { background: #eef4ff; border-left-color: #0a84ff; }
+  .net .name { font-size: 16px; }
+  .net.sel .name { color: #0a84ff; font-weight: 600; }
+  .net .meta { color: #999; font-size: 14px; }
+  .empty { padding: 16px; color: #999; text-align: center; font-size: 14px; }
+  .field { background: #fff; border-radius: 14px; padding: 4px 16px;
+           margin-bottom: 10px; box-shadow: 0 2px 6px rgba(30,40,90,.08); }
+  .field input { width: 100%; border: none; background: transparent;
+                 font-size: 16px; font-family: inherit; padding: 11px 0;
+                 outline: none; }
+  label.showpw { display: flex; align-items: center; gap: 8px;
+                 font-size: 14px; color: #666; margin: 0 4px 4px; }
+  label.showpw input { accent-color: #0a84ff; }
+  button { font-size: 16px; font-family: inherit; border: none;
+           border-radius: 12px; padding: 13px; cursor: pointer; width: 100%;
+           transition: opacity .15s; }
+  button:active { opacity: .8; }
+  #rescan { background: #e2e6f0; color: #1c1c1e; margin-top: 8px; }
+  #connect { background: linear-gradient(135deg, #4338ca 0%, #0a84ff 100%);
+             color: #fff; margin-top: 16px; font-weight: 600;
+             box-shadow: 0 2px 8px rgba(10,132,255,.35); }
+  #connect:disabled { opacity: .5; }
+  #msg { text-align: center; color: #666; font-size: 14px;
+         min-height: 20px; margin-top: 12px; }
+  #done { display: none; background: #fff; border-radius: 14px;
+          padding: 24px 16px; text-align: center; margin-top: 16px;
+          box-shadow: 0 2px 6px rgba(30,40,90,.08); }
+  #done .big { font-size: 40px; color: #30b15c; }
+  #done p { color: #444; font-size: 15px; line-height: 1.4; }
+  #done strong { color: #4338ca; }
+</style>
+</head>
+<body>
+<header>
+  <h1>DaVinci Setup</h1>
+  <div id="sub">Connect DaVinci to your Wi-Fi</div>
+</header>
+<main>
+  <div id="form">
+    <h2>Choose your network</h2>
+    <div id="nets"><div class="empty">Scanning&hellip;</div></div>
+    <button id="rescan">Scan again</button>
+
+    <h2>Network details</h2>
+    <div class="field"><input id="ssid" placeholder="Network name"
+         autocapitalize="none" autocorrect="off"></div>
+    <div class="field"><input id="pw" type="password"
+         placeholder="Password (leave blank if none)"
+         autocapitalize="none" autocorrect="off"></div>
+    <label class="showpw"><input id="showpw" type="checkbox">Show password</label>
+
+    <button id="connect">Connect</button>
+    <div id="msg"></div>
+  </div>
+
+  <div id="done">
+    <div class="big">&#10003;</div>
+    <p><strong>Saved!</strong> DaVinci is joining
+    <span id="donenet"></span>.</p>
+    <p>You can close this page. Your phone will drop the
+    <em>DaVinci-Setup</em> network and return to your home Wi-Fi
+    on its own. DaVinci will tell you when it is connected. If the
+    password was wrong, it will tell you that instead &mdash; join
+    <em>DaVinci-Setup</em> again and try once more.</p>
+  </div>
+</main>
+<script>
+let networks = [];
+
+function bars(signal) {
+  if (signal >= 60) return 'Strong';
+  if (signal >= 35) return 'Good';
+  return 'Weak';
+}
+
+function render() {
+  const box = document.getElementById('nets');
+  box.innerHTML = '';
+  if (networks.length === 0) {
+    box.innerHTML = '<div class="empty">No networks found &mdash; ' +
+                    'type the name below</div>';
+    return;
+  }
+  const chosen = document.getElementById('ssid').value;
+  networks.forEach(n => {
+    const row = document.createElement('div');
+    row.className = 'net' + (n.ssid === chosen ? ' sel' : '');
+    const name = document.createElement('span');
+    name.className = 'name';
+    name.textContent = (n.open ? '' : '🔒 ') + n.ssid;
+    const meta = document.createElement('span');
+    meta.className = 'meta';
+    meta.textContent = bars(n.signal);
+    row.append(name, meta);
+    row.onclick = () => {
+      document.getElementById('ssid').value = n.ssid;
+      document.getElementById('pw').focus();
+      render();
+    };
+    box.append(row);
+  });
+}
+
+function show(m) {
+  document.getElementById('msg').textContent = m;
+}
+
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}
+
+async function scan() {
+  document.getElementById('nets').innerHTML =
+    '<div class="empty">Scanning&hellip;</div>';
+  try {
+    const d = await api('/api/scan');
+    networks = d.networks;
+    render();
+  } catch (e) {
+    networks = [];
+    render();
+    show('Scan failed — you can still type the network name');
+  }
+}
+
+document.getElementById('rescan').onclick = scan;
+
+document.getElementById('showpw').onchange = e => {
+  document.getElementById('pw').type = e.target.checked ? 'text' : 'password';
+};
+
+document.getElementById('connect').onclick = async () => {
+  const ssid = document.getElementById('ssid').value.trim();
+  const pw = document.getElementById('pw').value;
+  if (!ssid) { show('Enter or pick a network name first'); return; }
+  const btn = document.getElementById('connect');
+  btn.disabled = true;
+  show('Saving…');
+  try {
+    await api('/api/wifi', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ssid: ssid, password: pw })
+    });
+    document.getElementById('donenet').textContent = '“' + ssid + '”';
+    document.getElementById('form').style.display = 'none';
+    document.getElementById('done').style.display = 'block';
+  } catch (e) {
+    btn.disabled = false;
+    show('Could not save — try again');
+  }
+};
+
+scan();
+</script>
+</body>
+</html>
