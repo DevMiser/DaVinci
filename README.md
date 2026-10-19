@@ -1,5 +1,5 @@
 # DaVinci
-### Voice-Activated AI Assistant for Raspberry Pi 4
+### Voice-Activated AI Assistant for Raspberry Pi 4 - New Version Fall 2026
 
 DaVinci is a voice-activated AI assistant that runs on a Raspberry Pi 4 with a USB speakerphone. Say the wake word **"DaVinci"** to start a conversation. Ask questions (including about current events, news, and sports via built-in web search) request the time or weather, set countdown timers, change the speaker volume, switch between three interaction modes (normal, conversational and strict), and more — all by voice. DaVinci has no display; an optional LED shows when it is listening and when it is responding.
 
