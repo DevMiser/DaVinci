@@ -2483,7 +2483,7 @@ class Realtime:
         print("\nListening for wake word...")
 
 def main():
-    url = "wss://api.openai.com/v1/realtime?model=gpt-realtime-2" # or change to preferred model
+    url = "wss://api.openai.com/v1/realtime?model=gpt-realtime-2.1" # or change to preferred model
     oww, pa = None, None
     audio_stream = None
 
